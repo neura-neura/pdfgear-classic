@@ -1,0 +1,9 @@
+PDFgear Classic starts automatically after installation and whenever you sign in to Windows.
+
+Install PDFgear first. The helper detects its installation from the running application, Windows installation records, or common installation folders.
+
+When you open PDFgear's print window, the helper automatically selects Classic Mode. The normal window may appear briefly. You still choose the pages and press the final Print button yourself.
+
+Setup also enables the traditional Windows print dialog for your Windows user. This can affect other applications that use that dialog. Your previous setting is saved and restored on uninstall unless the setting has since changed.
+
+This helper does not modify PDFgear or PDF documents and does not change your printer preferences. It includes the .NET runtime, so no separate runtime installation is needed.

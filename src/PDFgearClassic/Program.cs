@@ -1,4 +1,5 @@
 using System.IO;
+using System.Diagnostics;
 using Forms = System.Windows.Forms;
 
 namespace pdfgear_classic_helper;
@@ -8,24 +9,43 @@ static class Program
     [STAThread]
     static void Main(string[] args)
     {
+        if (args.Length == 1 && args[0] == "--stop")
+        {
+            StopInstalledInstances();
+            return;
+        }
         using var mutex = new Mutex(true, @"Local\PDFgearClassic", out bool created);
         if (!created) return;
         Forms.Application.SetHighDpiMode(Forms.HighDpiMode.PerMonitorV2);
 
-        var candidates = new[]
-        {
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "PDFgear", "pdfeditor.exe"),
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "PDFgear", "pdfeditor.exe")
-        };
-        string? path = args.Length == 1 ? args[0] : candidates.FirstOrDefault(File.Exists);
-        if (args.Length > 1 || string.IsNullOrWhiteSpace(path) || !File.Exists(path)
-            || !Path.GetFileName(path).Equals("pdfeditor.exe", StringComparison.OrdinalIgnoreCase))
+        string? path = args.Length == 1 ? args[0] : PdfgearLocator.Find();
+        if (args.Length > 1 || !PdfgearLocator.IsValid(path))
         {
             Forms.MessageBox.Show(
-                "Pass the full path to PDFgear's pdfeditor.exe as the only argument.\n\nExample:\nPDFgearClassic.exe \"C:\\Program Files\\PDFgear\\pdfeditor.exe\"",
+                "PDFgear could not be found. Install PDFgear and start this helper again, or pass the full path to pdfeditor.exe.\n\nExample:\nPDFgearClassic.exe \"C:\\Program Files\\PDFgear\\pdfeditor.exe\"",
                 "PDFgear Classic", Forms.MessageBoxButtons.OK, Forms.MessageBoxIcon.Information);
             return;
         }
-        Forms.Application.Run(new ClassicContext(path));
+        Forms.Application.Run(new ClassicContext(path!));
+    }
+
+    static void StopInstalledInstances()
+    {
+        foreach (var process in Process.GetProcessesByName("PDFgearClassic"))
+        {
+            using (process)
+            {
+                if (process.Id == Environment.ProcessId) continue;
+                try
+                {
+                    if (string.Equals(process.MainModule?.FileName, Environment.ProcessPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        process.Kill();
+                        process.WaitForExit(5000);
+                    }
+                }
+                catch (Exception) { }
+            }
+        }
     }
 }

@@ -8,6 +8,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
     <AssemblyName>PDFgearClassic</AssemblyName>
+    <Version>1.1.0</Version>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
