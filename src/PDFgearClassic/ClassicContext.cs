@@ -10,6 +10,7 @@ sealed class ClassicContext : Forms.ApplicationContext
 {
     readonly Forms.Timer timer = new() { Interval = 250 };
     readonly string expectedPath;
+    readonly bool needsRangeGuard;
     readonly Dictionary<int, bool> processes = new();
     nint lastAttempt;
     DateTime lastAttemptTime;
@@ -19,6 +20,8 @@ sealed class ClassicContext : Forms.ApplicationContext
     public ClassicContext(string pdfgearPath)
     {
         expectedPath = Path.GetFullPath(pdfgearPath);
+        var version = FileVersionInfo.GetVersionInfo(expectedPath);
+        needsRangeGuard = version.FileMajorPart == 2 && version.FileMinorPart == 1 && version.FileBuildPart == 20;
         var logDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PDFgearClassic");
         Directory.CreateDirectory(logDirectory);
         logPath = Path.Combine(logDirectory, "activity.log");
@@ -43,11 +46,15 @@ sealed class ClassicContext : Forms.ApplicationContext
             if (!processes.TryGetValue(id, out bool allowed))
             {
                 using var process = Process.GetProcessById(id);
+                string? runningPath = process.MainModule?.FileName;
                 allowed = process.ProcessName.Equals("pdfeditor", StringComparison.OrdinalIgnoreCase)
-                    && string.Equals(process.MainModule?.FileName, expectedPath, StringComparison.OrdinalIgnoreCase);
+                    && string.Equals(runningPath, expectedPath, StringComparison.OrdinalIgnoreCase);
+                if (allowed) LegacyPrintPreference.Apply(runningPath!);
                 processes[id] = allowed;
             }
-            if (!allowed || (handle == lastAttempt && (DateTime.UtcNow-lastAttemptTime).TotalSeconds < 5)) return;
+            if (!allowed) return;
+            if (needsRangeGuard && ClassicRangeGuard.Apply(handle)) return;
+            if (handle == lastAttempt && (DateTime.UtcNow-lastAttemptTime).TotalSeconds < 5) return;
             var root = AutomationElement.FromHandle(handle);
             if (root.Current.Name != "PDFgear" || !root.Current.IsEnabled) return;
             var printer = root.FindFirst(TreeScope.Descendants,

@@ -1,4 +1,4 @@
-#define AppVersion "1.1.2"
+#define AppVersion "1.1.3"
 
 [Setup]
 AppId={{56C66D10-E1EA-4A1C-B069-812EF5A67425}
@@ -110,7 +110,7 @@ begin
             AddedEntry := Copy(AddedRest, 1, J - 1);
             Delete(AddedRest, 1, J);
           end;
-          if CompareText(Entry, AddedEntry) = 0 then Keep := False;
+          if Entry = AddedEntry then Keep := False;
         end;
         if Keep and (Entry <> '') then
         begin

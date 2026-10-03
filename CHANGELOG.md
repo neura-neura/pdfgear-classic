@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.3
+
+- Work around PDFgear 2.1.20's classic printing crash when the Windows dialog returns AllPages or CurrentPage. The application throws an unhandled ArgumentNullException because its print code requires SomePages.
+- Keep Pages selected in the native classic dialog. For a one-page document, enable the otherwise disabled Pages choice and populate the range with 1. For multiple pages, preserve the range supplied by PDFgear. All and Current Page are disabled while this workaround is active; enter the desired range in Pages.
+- Limit the range workaround to PDFgear 2.1.20. Other versions retain their page selection behavior.
+- Register the exact path reported by a running PDFgear process in addition to the detected installation path, preserving distinct path spellings. This is a defensive change; path spelling has not been established as the cause of the modern dialog returning.
+- A one-page PDF showed Pages: 1 and an eight-page PDF showed Pages: 1-8. No print jobs were submitted, so successful physical printing remains unconfirmed.
+- The previous observation that the classic dialog appeared after reopening did not establish that version 1.1.2 fixed every launch or the printing crash. The user subsequently reported both failures.
+
 ## 1.1.2
 
 - Register the detected PDFgear executable in Windows' application list for the traditional print dialog. The global preference used in 1.1.1 was insufficient after reopening PDFgear on the reported setup.

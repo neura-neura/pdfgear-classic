@@ -8,3 +8,5 @@ The helper registers PDFgear in Windows' application list for the traditional pr
 
 This helper does not modify PDFgear or PDF documents and does not change your printer preferences. It includes the .NET runtime, so no separate runtime installation is needed.
 
+
+With PDFgear 2.1.20, the helper keeps Pages selected to avoid a known crash. Enter the page range there; All and Current Page are disabled. Physical printing has not been confirmed for this repair.

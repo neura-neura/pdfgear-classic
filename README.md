@@ -6,13 +6,19 @@ Use it if Classic Mode works better with your printer and you want to skip selec
 
 ## Install
 
-Download **PDFgearClassic-Setup-1.1.2-win-x64.exe** from [Releases](https://github.com/neura-neura/pdfgear-classic/releases/latest), then run the installer. PDFgear must already be installed. The installer is for Windows 10/11 on x64-compatible systems and installs for your current user.
+Download **PDFgearClassic-Setup-1.1.3-win-x64.exe** from [Releases](https://github.com/neura-neura/pdfgear-classic/releases/latest), then run the installer. PDFgear must already be installed. The installer is for Windows 10/11 on x64-compatible systems and installs for your current user.
 
 Setup starts the helper immediately and adds automatic startup when you sign in to Windows. It includes the .NET runtime. The helper detects PDFgear from its running process, Windows installation records, or common installation folders, including installations on another drive registered by PDFgear's installer.
 
 The helper registers the detected PDFgear executable in Windows' application list for the traditional print dialog. It preserves other entries and removes only entries it added when you uninstall. Setup also enables the traditional Windows print dialog for your user. This may affect other applications using the same Windows dialog. It saves the previous value and restores it on uninstall if that value is still the one set by Setup. Your printer preferences remain under your control.
 
 The installer is unsigned. This repository does not include a code-signing certificate.
+
+## PDFgear 2.1.20: page range workaround
+
+PDFgear 2.1.20 crashes in its classic print path if Windows returns AllPages or CurrentPage. Version 1.1.3 keeps **Pages** selected instead. For a one-page document it enables that choice and fills in **1**; for multiple pages it preserves the range supplied by PDFgear. **All** and **Current Page** are disabled while this workaround is active. Enter a page or range such as **1**, **2-4**, or **1-8** in Pages before printing.
+
+The corrected dialog was observed with one-page and eight-page documents. No print jobs were submitted during this repair, so physical printing has not been confirmed. The user reported that the Windows modern dialog still returned after updating to 1.1.2. Version 1.1.3 also records the exact running executable path, but that change has not been established as a fix for every launch.
 
 ## Build requirements
 
@@ -96,7 +102,7 @@ If the compiler is installed in a custom location, pass `-InnoCompiler 'C:\path\
 The helper checks the foreground window and verifies that its process matches the configured PDFgear executable. It recognizes PDFgear's regular print window using its printer control, then finds **Classic Mode** through Windows UI Automation. It invokes that control when possible; otherwise, it clicks its reported position and restores the pointer.
 
 - It only acts on the configured PDFgear installation.
-- It does not press the final Print button or submit print jobs.
+- It does not press the final Print button or submit print jobs. With PDFgear 2.1.20 it also selects a compatible page range in the native classic dialog.
 - The helper does not edit PDFs, patch PDFgear, change printer settings, or access the network. It reapplies the traditional Windows print dialog preference for your user. Setup also configures automatic startup.
 - It runs one instance per Windows session.
 
@@ -111,5 +117,4 @@ To stop the helper, end **PDFgearClassic.exe** in Task Manager or run `PDFgearCl
 For a manual installation, remove **PDFgear Classic.lnk** from your Startup folder and remove the installed folder after stopping the helper. Revert any Windows print dialog change separately.
 
 This project is independent of PDFgear and Canon. Source code is provided under the MIT license.
-
 

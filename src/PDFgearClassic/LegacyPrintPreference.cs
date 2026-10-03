@@ -19,12 +19,12 @@ static class LegacyPrintPreference
         // Reapply even when already set: the value alone was insufficient in the reported session.
         preference.SetValue("PreferLegacyPrintDialog", 1, RegistryValueKind.DWord);
         var applications = (preference.GetValue("PreferLegacyAppList") as string[] ?? Array.Empty<string>()).ToList();
-        if (!applications.Contains(pdfgearPath, StringComparer.OrdinalIgnoreCase))
+        if (!applications.Contains(pdfgearPath, StringComparer.Ordinal))
         {
             applications.Add(pdfgearPath);
             preference.SetValue("PreferLegacyAppList", applications.ToArray(), RegistryValueKind.MultiString);
             var added = (backup.GetValue("AddedLegacyApplications") as string[] ?? Array.Empty<string>()).ToList();
-            if (!added.Contains(pdfgearPath, StringComparer.OrdinalIgnoreCase)) added.Add(pdfgearPath);
+            if (!added.Contains(pdfgearPath, StringComparer.Ordinal)) added.Add(pdfgearPath);
             backup.SetValue("AddedLegacyApplications", added.ToArray(), RegistryValueKind.MultiString);
         }
         preference.Flush();
