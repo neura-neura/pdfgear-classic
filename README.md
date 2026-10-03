@@ -6,11 +6,11 @@ Use it if Classic Mode works better with your printer and you want to skip selec
 
 ## Install
 
-Download **PDFgearClassic-Setup-1.1.1-win-x64.exe** from [Releases](https://github.com/neura-neura/pdfgear-classic/releases/latest), then run the installer. PDFgear must already be installed. The installer is for Windows 10/11 on x64-compatible systems and installs for your current user.
+Download **PDFgearClassic-Setup-1.1.2-win-x64.exe** from [Releases](https://github.com/neura-neura/pdfgear-classic/releases/latest), then run the installer. PDFgear must already be installed. The installer is for Windows 10/11 on x64-compatible systems and installs for your current user.
 
 Setup starts the helper immediately and adds automatic startup when you sign in to Windows. It includes the .NET runtime. The helper detects PDFgear from its running process, Windows installation records, or common installation folders, including installations on another drive registered by PDFgear's installer.
 
-Setup also enables the traditional Windows print dialog for your user. This may affect other applications using the same Windows dialog. It saves the previous value and restores it on uninstall if that value is still the one set by Setup. Your printer preferences remain under your control.
+The helper registers the detected PDFgear executable in Windows' application list for the traditional print dialog. It preserves other entries and removes only entries it added when you uninstall. Setup also enables the traditional Windows print dialog for your user. This may affect other applications using the same Windows dialog. It saves the previous value and restores it on uninstall if that value is still the one set by Setup. Your printer preferences remain under your control.
 
 The installer is unsigned. This repository does not include a code-signing certificate.
 
@@ -79,7 +79,7 @@ New-Item -Path $key -Force | Out-Null
 New-ItemProperty -Path $key -Name PreferLegacyPrintDialog -PropertyType DWord -Value 1 -Force | Out-Null
 ```
 
-Reopen PDFgear afterward. This Windows setting can affect other applications that use the same print dialog. The installer and helper set it automatically. The helper reapplies it at startup and before selecting Classic Mode. Restart PDFgear once after updating if it is already open. To undo a manual change, restore the previous value, or remove `PreferLegacyPrintDialog` if it did not exist before.
+Reopen PDFgear afterward. This Windows setting can affect other applications that use the same print dialog. The installer and helper set it automatically. The helper reapplies it at startup and before selecting Classic Mode. Starting with 1.1.2, it also adds PDFgear's full executable path to the REG_MULTI_SZ value PreferLegacyAppList in the same registry key. The earlier global preference alone did not survive reopening PDFgear on the reported setup; the application entry produced the traditional dialog after two complete close/reopen cycles. Windows supports this application list as documented by [Appeon](https://docs.appeon.com/pb2025r2/troubleshooting_guide/tr_1455.html). Restart PDFgear once after updating if it is already open. To undo a manual change, restore the previous value, or remove `PreferLegacyPrintDialog` if it did not exist before.
 
 ## Build the installer
 
@@ -111,4 +111,5 @@ To stop the helper, end **PDFgearClassic.exe** in Task Manager or run `PDFgearCl
 For a manual installation, remove **PDFgear Classic.lnk** from your Startup folder and remove the installed folder after stopping the helper. Revert any Windows print dialog change separately.
 
 This project is independent of PDFgear and Canon. Source code is provided under the MIT license.
+
 

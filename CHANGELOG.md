@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.2
+
+- Register the detected PDFgear executable in Windows' application list for the traditional print dialog. The global preference used in 1.1.1 was insufficient after reopening PDFgear on the reported setup.
+- Preserve other application entries and track entries added by the helper so uninstall can remove only those entries.
+- The traditional dialog was observed after two complete PDFgear close/reopen cycles with the application entry present. No print jobs were submitted.
+- Restart PDFgear once after updating if it is already open. This behavior was observed with PDFgear 2.1.20 in English on the original Windows 11 setup; other installations and languages have not been checked.
+
 ## 1.1.1
 
 - Reapply the traditional Windows print dialog preference when the helper starts and before selecting Classic Mode.

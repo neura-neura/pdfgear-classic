@@ -4,7 +4,7 @@ namespace pdfgear_classic_helper;
 
 static class LegacyPrintPreference
 {
-    public static void Apply()
+    public static void Apply(string pdfgearPath)
     {
         using var root = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64);
         using var preference = root.CreateSubKey(@"Software\Microsoft\Print\UnifiedPrintDialog");
@@ -18,6 +18,15 @@ static class LegacyPrintPreference
         }
         // Reapply even when already set: the value alone was insufficient in the reported session.
         preference.SetValue("PreferLegacyPrintDialog", 1, RegistryValueKind.DWord);
+        var applications = (preference.GetValue("PreferLegacyAppList") as string[] ?? Array.Empty<string>()).ToList();
+        if (!applications.Contains(pdfgearPath, StringComparer.OrdinalIgnoreCase))
+        {
+            applications.Add(pdfgearPath);
+            preference.SetValue("PreferLegacyAppList", applications.ToArray(), RegistryValueKind.MultiString);
+            var added = (backup.GetValue("AddedLegacyApplications") as string[] ?? Array.Empty<string>()).ToList();
+            if (!added.Contains(pdfgearPath, StringComparer.OrdinalIgnoreCase)) added.Add(pdfgearPath);
+            backup.SetValue("AddedLegacyApplications", added.ToArray(), RegistryValueKind.MultiString);
+        }
         preference.Flush();
     }
 }

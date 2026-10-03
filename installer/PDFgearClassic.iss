@@ -1,4 +1,4 @@
-#define AppVersion "1.1.1"
+#define AppVersion "1.1.2"
 
 [Setup]
 AppId={{56C66D10-E1EA-4A1C-B069-812EF5A67425}
@@ -72,9 +72,55 @@ end;
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
   Value, Previous, Existed: Cardinal;
+  Added, Current, Remaining, Entry, AddedEntry, AddedRest: String;
+  I, J: Integer;
+  Keep: Boolean;
 begin
   if CurUninstallStep = usUninstall then
   begin
+    if RegQueryMultiStringValue(HKCU, BackupKey, 'AddedLegacyApplications', Added) and
+       RegQueryMultiStringValue(HKCU, PrintKey, 'PreferLegacyAppList', Current) then
+    begin
+      Remaining := '';
+      while Current <> '' do
+      begin
+        I := Pos(#0, Current);
+        if I = 0 then
+        begin
+          Entry := Current;
+          Current := '';
+        end
+        else
+        begin
+          Entry := Copy(Current, 1, I - 1);
+          Delete(Current, 1, I);
+        end;
+        Keep := True;
+        AddedRest := Added;
+        while AddedRest <> '' do
+        begin
+          J := Pos(#0, AddedRest);
+          if J = 0 then
+          begin
+            AddedEntry := AddedRest;
+            AddedRest := '';
+          end
+          else
+          begin
+            AddedEntry := Copy(AddedRest, 1, J - 1);
+            Delete(AddedRest, 1, J);
+          end;
+          if CompareText(Entry, AddedEntry) = 0 then Keep := False;
+        end;
+        if Keep and (Entry <> '') then
+        begin
+          if Remaining <> '' then Remaining := Remaining + #0;
+          Remaining := Remaining + Entry;
+        end;
+      end;
+      if Remaining = '' then RegDeleteValue(HKCU, PrintKey, 'PreferLegacyAppList')
+      else RegWriteMultiStringValue(HKCU, PrintKey, 'PreferLegacyAppList', Remaining);
+    end;
     if RegQueryDWordValue(HKCU, PrintKey, 'PreferLegacyPrintDialog', Value) and (Value = 1) then
     begin
       if RegQueryDWordValue(HKCU, BackupKey, 'PreviousValueExisted', Existed) then
