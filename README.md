@@ -6,7 +6,7 @@ Use it if Classic Mode works better with your printer and you want to skip selec
 
 ## Install
 
-Download **PDFgearClassic-Setup-1.1.0-win-x64.exe** from [Releases](https://github.com/neura-neura/pdfgear-classic/releases/latest), then run the installer. PDFgear must already be installed. The installer is for Windows 10/11 on x64-compatible systems and installs for your current user.
+Download **PDFgearClassic-Setup-1.1.1-win-x64.exe** from [Releases](https://github.com/neura-neura/pdfgear-classic/releases/latest), then run the installer. PDFgear must already be installed. The installer is for Windows 10/11 on x64-compatible systems and installs for your current user.
 
 Setup starts the helper immediately and adds automatic startup when you sign in to Windows. It includes the .NET runtime. The helper detects PDFgear from its running process, Windows installation records, or common installation folders, including installations on another drive registered by PDFgear's installer.
 
@@ -79,7 +79,7 @@ New-Item -Path $key -Force | Out-Null
 New-ItemProperty -Path $key -Name PreferLegacyPrintDialog -PropertyType DWord -Value 1 -Force | Out-Null
 ```
 
-Reopen PDFgear afterward. This Windows setting can affect other applications that use the same print dialog. The release installer sets it automatically; manual builds do not. To undo a manual change, restore the previous value, or remove `PreferLegacyPrintDialog` if it did not exist before.
+Reopen PDFgear afterward. This Windows setting can affect other applications that use the same print dialog. The installer and helper set it automatically. The helper reapplies it at startup and before selecting Classic Mode. Restart PDFgear once after updating if it is already open. To undo a manual change, restore the previous value, or remove `PreferLegacyPrintDialog` if it did not exist before.
 
 ## Build the installer
 
@@ -97,7 +97,7 @@ The helper checks the foreground window and verifies that its process matches th
 
 - It only acts on the configured PDFgear installation.
 - It does not press the final Print button or submit print jobs.
-- The helper does not edit PDFs, patch PDFgear, change printer settings, or access the network. Setup separately configures automatic startup and the traditional Windows print dialog.
+- The helper does not edit PDFs, patch PDFgear, change printer settings, or access the network. It reapplies the traditional Windows print dialog preference for your user. Setup also configures automatic startup.
 - It runs one instance per Windows session.
 
 Local activity entries are written to `%LOCALAPPDATA%\PDFgearClassic\activity.log`. They contain timestamps and the helper's switch action, without document names or contents. An entry records that the action was issued, not proof that a print job succeeded.
@@ -111,3 +111,4 @@ To stop the helper, end **PDFgearClassic.exe** in Task Manager or run `PDFgearCl
 For a manual installation, remove **PDFgear Classic.lnk** from your Startup folder and remove the installed folder after stopping the helper. Revert any Windows print dialog change separately.
 
 This project is independent of PDFgear and Canon. Source code is provided under the MIT license.
+

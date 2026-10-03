@@ -22,6 +22,7 @@ sealed class ClassicContext : Forms.ApplicationContext
         var logDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PDFgearClassic");
         Directory.CreateDirectory(logDirectory);
         logPath = Path.Combine(logDirectory, "activity.log");
+        LegacyPrintPreference.Apply();
         timer.Tick += (_, _) => SwitchIfNeeded();
         timer.Start();
     }
@@ -59,6 +60,7 @@ sealed class ClassicContext : Forms.ApplicationContext
             if (classic == null || classic.Current.IsOffscreen || !classic.Current.IsEnabled) return;
             var bounds = classic.Current.BoundingRectangle;
             if (bounds.IsEmpty || bounds.Width < 1 || bounds.Height < 1 || GetForegroundWindow()!=handle) return;
+            LegacyPrintPreference.Apply();
             lastAttempt = handle;
             lastAttemptTime = DateTime.UtcNow;
             if (classic.TryGetCurrentPattern(InvokePattern.Pattern, out var pattern))
