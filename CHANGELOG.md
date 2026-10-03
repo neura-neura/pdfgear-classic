@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.4
+
+- Remove the control workaround from 1.1.3. Windows' extended dialog still allowed zero page ranges for the reported one-page document, producing a validation error when Print was pressed.
+- Add a reversible local code repair for a specific PDFgear 2.1.20 executable, verified by SHA-256. Other builds are left unchanged.
+- Make Classic Mode use the older Windows print dialog and normalize AllPages to a full SomePages range before PDFgear's existing print-range check. Explicit page ranges are preserved.
+- Save the untouched original executable and a checksum record alongside it. Add manual restoration and an uninstall restoration attempt. A running application or insufficient permissions can prevent restoration; the backup remains.
+- The modified executable loses its vendor signature. PDF files are not modified, and no PDFgear binaries are distributed in this release.
+- The repaired application opened through its normal launcher and displayed the older dialog with All enabled for a one-page PDF. Its patched code was inspected. No print jobs were submitted, so physical printing remains unconfirmed.
+
 ## 1.1.3
 
 - Work around PDFgear 2.1.20's classic printing crash when the Windows dialog returns AllPages or CurrentPage. The application throws an unhandled ArgumentNullException because its print code requires SomePages.

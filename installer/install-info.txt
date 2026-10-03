@@ -1,12 +1,11 @@
-PDFgear Classic starts automatically after installation and whenever you sign in to Windows.
+PDFgear Classic starts after installation and when you sign in to Windows.
 
-Install PDFgear first. The helper detects its installation from the running application, Windows installation records, or common installation folders.
+Close PDFgear before installing. Version 1.1.4 applies a reversible code repair to one supported PDFgear 2.1.20 executable. It switches Classic Mode to the older Windows print dialog and converts All to a valid full-document page range before printing.
 
-When you open PDFgear's print window, the helper automatically selects Classic Mode. The normal window may appear briefly. You still choose the pages and press the final Print button yourself.
+The repair modifies pdfeditor.exe and invalidates its original vendor signature. An untouched original backup and checksum record are saved next to it. Other executable builds are left unchanged. PDF documents remain untouched.
 
-The helper registers PDFgear in Windows' application list for the traditional print dialog and preserves other applications in that list. Setup also enables the traditional Windows print dialog for your Windows user. This can affect other applications that use that dialog. Your previous setting is saved and restored on uninstall unless the setting has since changed.
+The installation folder must be writable. For protected PDFgear folders, run this installer with administrator rights under the same Windows account. Close PDFgear before uninstalling so its original executable can be restored.
 
-This helper does not modify PDFgear or PDF documents and does not change your printer preferences. It includes the .NET runtime, so no separate runtime installation is needed.
+The normal PDFgear print window may appear briefly. You still choose the printer and press the final OK button yourself. This helper does not submit print jobs. Physical printing has not been confirmed for this repair.
 
-
-With PDFgear 2.1.20, the helper keeps Pages selected to avoid a known crash. Enter the page range there; All and Current Page are disabled. Physical printing has not been confirmed for this repair.
+The installer includes the .NET runtime. It also retains the user-wide Windows legacy print preference from previous releases; this may affect other applications. Its previous value is saved for uninstall restoration.

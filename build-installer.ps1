@@ -19,6 +19,8 @@ try {
     }
     dotnet publish .\src\PDFgearClassic\PDFgearClassic.csproj -c Release -r win-x64 --self-contained true -o .\publish
     if ($LASTEXITCODE -ne 0) { throw 'Publishing PDFgear Classic failed.' }
+    New-Item -ItemType Directory -Path .\publish\licenses -Force | Out-Null
+    Copy-Item .\licenses\*.txt .\publish\licenses -Force
     $dependencies = Get-Content -LiteralPath .\publish\PDFgearClassic.deps.json -Raw | ConvertFrom-Json
     $packageRoot = if ($env:NUGET_PACKAGES) { $env:NUGET_PACKAGES } else { Join-Path $env:USERPROFILE '.nuget\packages' }
     foreach ($library in $dependencies.libraries.PSObject.Properties.Name) {

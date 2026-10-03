@@ -10,22 +10,28 @@ sealed class ClassicContext : Forms.ApplicationContext
 {
     readonly Forms.Timer timer = new() { Interval = 250 };
     readonly string expectedPath;
-    readonly bool needsRangeGuard;
     readonly Dictionary<int, bool> processes = new();
     nint lastAttempt;
     DateTime lastAttemptTime;
     DateTime lastProcessRefresh;
     readonly string logPath;
+    bool repairPending;
+    DateTime lastRepairAttempt;
 
     public ClassicContext(string pdfgearPath)
     {
         expectedPath = Path.GetFullPath(pdfgearPath);
-        var version = FileVersionInfo.GetVersionInfo(expectedPath);
-        needsRangeGuard = version.FileMajorPart == 2 && version.FileMinorPart == 1 && version.FileBuildPart == 20;
         var logDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PDFgearClassic");
         Directory.CreateDirectory(logDirectory);
         logPath = Path.Combine(logDirectory, "activity.log");
         LegacyPrintPreference.Apply(expectedPath);
+        try
+        {
+            string repair = PdfgearRepair.Apply(expectedPath);
+            repairPending = repair.StartsWith("Close PDFgear", StringComparison.Ordinal);
+            File.AppendAllText(logPath, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {repair}\n");
+        }
+        catch (Exception error) { File.AppendAllText(logPath, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} Repair could not be applied: {error.GetType().Name}\n"); }
         timer.Tick += (_, _) => SwitchIfNeeded();
         timer.Start();
     }
@@ -34,6 +40,13 @@ sealed class ClassicContext : Forms.ApplicationContext
     {
         try
         {
+            if (repairPending && (DateTime.UtcNow - lastRepairAttempt).TotalSeconds > 2)
+            {
+                lastRepairAttempt = DateTime.UtcNow;
+                string repair = PdfgearRepair.Apply(expectedPath);
+                repairPending = repair.StartsWith("Close PDFgear", StringComparison.Ordinal);
+                if (!repairPending) File.AppendAllText(logPath, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {repair}\n");
+            }
             nint handle = GetForegroundWindow();
             if (handle == 0) return;
             GetWindowThreadProcessId(handle, out uint rawId);
@@ -53,7 +66,6 @@ sealed class ClassicContext : Forms.ApplicationContext
                 processes[id] = allowed;
             }
             if (!allowed) return;
-            if (needsRangeGuard && ClassicRangeGuard.Apply(handle)) return;
             if (handle == lastAttempt && (DateTime.UtcNow-lastAttemptTime).TotalSeconds < 5) return;
             var root = AutomationElement.FromHandle(handle);
             if (root.Current.Name != "PDFgear" || !root.Current.IsEnabled) return;

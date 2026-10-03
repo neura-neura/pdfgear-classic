@@ -9,6 +9,26 @@ static class Program
     [STAThread]
     static void Main(string[] args)
     {
+        if (args.Length == 1 && args[0] == "--restore-pdfgear")
+        {
+            var installation = PdfgearLocator.Find();
+            if (installation is not null) Forms.MessageBox.Show(PdfgearRepair.Restore(installation), "PDFgear Classic");
+            return;
+        }
+        if (args.Length == 1 && args[0] == "--restore-pdfgear-silent")
+        {
+            try
+            {
+                var installation = PdfgearLocator.Find();
+                if (installation is not null)
+                {
+                    string result = PdfgearRepair.Restore(installation);
+                    if (result.StartsWith("Close PDFgear", StringComparison.Ordinal)) Forms.MessageBox.Show(result + "\nThe original backup is retained next to pdfeditor.exe.", "PDFgear Classic");
+                }
+            }
+            catch (Exception error) { Forms.MessageBox.Show("The original PDFgear executable could not be restored: " + error.Message + "\nThe original backup is retained next to pdfeditor.exe.", "PDFgear Classic"); }
+            return;
+        }
         if (args.Length == 1 && args[0] == "--stop")
         {
             StopInstalledInstances();

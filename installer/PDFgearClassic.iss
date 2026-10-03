@@ -1,4 +1,4 @@
-#define AppVersion "1.1.3"
+#define AppVersion "1.1.4"
 
 [Setup]
 AppId={{56C66D10-E1EA-4A1C-B069-812EF5A67425}
@@ -44,6 +44,7 @@ Filename: "{app}\PDFgearClassic.exe"; Description: "Start PDFgear Classic"; Flag
 
 [UninstallRun]
 Filename: "{app}\PDFgearClassic.exe"; Parameters: "--stop"; Flags: runhidden waituntilterminated; RunOnceId: "StopPDFgearClassic"
+Filename: "{app}\PDFgearClassic.exe"; Parameters: "--restore-pdfgear-silent"; Flags: runhidden waituntilterminated; RunOnceId: "RestorePDFgearExecutable"
 
 [Code]
 const
